@@ -30,14 +30,16 @@ class projectile:
 
 p1 = projectile(22, 43)
 
-fig, ax = plt.subplots()
 
 
 
 while p1.newY >= 0:
     p1.move()
     p1.gravity()
-
-    ax.plot([p1.newX], [p1.newY], 'go--')
-
+    
+    
+fig, ax = plt.subplots()
+Xlist = [pos[0] for pos in p1.position]
+Ylist = [pos[1] for pos in p1.position]
+plt.plot(Xlist, Ylist, '-')
 plt.show()
