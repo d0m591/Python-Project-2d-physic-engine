@@ -1,71 +1,70 @@
-from functools import total_ordering
-
 import matplotlib.pyplot as plt
-import numpy as np
 import math
 from matplotlib.animation import FuncAnimation
+from matplotlib.widgets import Slider, Button
 
 gravity = -9.81
-timestep = 0.02
+timestep = 0.01
 
 class Projectile:
-    def __init__(self, velocity, angle):
+    def __init__(self, velocity, angle, gravity):
         self.velocity = velocity
         self.angle = math.radians(angle)
-
-        # velocity components
+        self.gravity = gravity
         self.xv = self.velocity * math.cos(self.angle)
         self.yv = self.velocity * math.sin(self.angle)
-
-        # position list
         self.position = [[0, 0]]
+        self.is_airborne = True
 
     def move(self):
-        x = self.position[-1][0] + self.xv * timestep
-        y = self.position[-1][1] + self.yv * timestep
-        self.position.append([x, y])
+        if self.is_airborne:
+            x = self.position[-1][0] + self.xv * timestep
+            y = self.position[-1][1] + self.yv * timestep
+            if y < 0:
+                y = 0
+                self.is_airborne = False
+            self.position.append([x, y])
 
     def apply_gravity(self):
-        self.yv += gravity * timestep
+        if self.is_airborne:
+            self.yv += self.gravity * timestep
+
+    def discover(self):
+        timetaken = (-(self.yv) / gravity) * 2
+        t_peak = timetaken * 1 / 2
+        maxY = (self.yv * t_peak + 1 / 2 * gravity * (t_peak ** 2))
+        maxX = (self.xv * timetaken)
+        return maxX * 1.1 , maxY * 1.1       # I multiply each value to give a buffer so it doesnt go off screen
+
+p1 = Projectile(22, 43, -9.81)
+
+#discovering x-limits and y-limtits
 
 
-p1 = Projectile(100, 15)
 
-#Total time
-totalTime = (2 * p1.yv) / -gravity
-totalDistance = (p1.xv * totalTime)
-totalHeight = (p1.yv * totalTime) + 0.5 * (-gravity * totalTime * totalTime)
+maxX, maxY = p1.discover()
 
-fig, ax = plt.subplots()
+#Ui
+fig, ax = plt.subplots(figsize=(10, 7))
+fig.subplots_adjust(bottom=0.25) #Makes 25% of the bottom of the screen for sliders to customise
+ax.set_xlim(0, maxX)
+ax.set_ylim(0, maxY)
 
 
-line, = ax.plot([], [], 'r-')
+ax.set_title('Projectile Motion')
+ax.set_xlabel('Height [m]')
+ax.set_ylabel('Distance [m]')
+
+
+
+
+line, = ax.plot([], [], lw=2)
 
 def init():
     line.set_data([], [])
-
-    ax.set_xlim([0, totalDistance])
-    ax.set_ylim([0, totalHeight])
     return line,
 
-blit = True
-def update(Frame):
-    # predict next y before moving
-    next_y = p1.position[-1][1] + p1.yv * timestep
-
-    # if next step would fall below ground, freeze at exactly y=0
-    if next_y < 0:
-
-        p1.position.append([p1.position[-1][0] + p1.xv * timestep, 0])
-
-        Xlist = [pos[0] for pos in p1.position]
-        Ylist = [pos[1] for pos in p1.position]
-
-        line.set_data(Xlist, Ylist)
-
-        ani.event_source.stop()
-        return line,
-
+def update(frame):
     p1.move()
     p1.apply_gravity()
 
@@ -76,11 +75,7 @@ def update(Frame):
     return line,
 
 
-ani = FuncAnimation(fig,
-                    update,
-                    frames=1,
-                    init_func=init,
-                    blit=False,
-                    interval=1)
+ani = FuncAnimation(fig, update, init_func=init,blit=True, interval=5, repeat=True, frames=1)
+
 
 plt.show()
