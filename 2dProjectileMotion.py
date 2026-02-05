@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import math
 from matplotlib.animation import FuncAnimation
-from matplotlib.widgets import Slider, Button
+from matplotlib.widgets import Slider, Button as wid
 
 gravity = -9.81
-timestep = 0.01
+timestep = 0.02
 
 class Projectile:
     def __init__(self, velocity, angle, gravity):
@@ -15,6 +15,8 @@ class Projectile:
         self.yv = self.velocity * math.sin(self.angle)
         self.position = [[0, 0]]
         self.is_airborne = True
+        self.timetaken = -2 * self.yv / self.gravity  # works when gravity is negative
+        self.t_peak = -self.yv / self.gravity
 
     def move(self):
         if self.is_airborne:
@@ -30,18 +32,13 @@ class Projectile:
             self.yv += self.gravity * timestep
 
     def discover(self):
-        timetaken = (-(self.yv) / gravity) * 2
-        t_peak = timetaken * 1 / 2
-        maxY = (self.yv * t_peak + 1 / 2 * gravity * (t_peak ** 2))
-        maxX = (self.xv * timetaken)
+        maxY = (self.yv * self.t_peak + 1 / 2 * gravity * (self.t_peak ** 2))
+        maxX = (self.xv * self.timetaken)
         return maxX * 1.1 , maxY * 1.1       # I multiply each value to give a buffer so it doesnt go off screen
 
-p1 = Projectile(22, 43, -9.81)
+p1 = Projectile(25, 45, -9.81)
 
 #discovering x-limits and y-limtits
-
-
-
 maxX, maxY = p1.discover()
 
 #Ui
@@ -52,8 +49,8 @@ ax.set_ylim(0, maxY)
 
 
 ax.set_title('Projectile Motion')
-ax.set_xlabel('Height [m]')
-ax.set_ylabel('Distance [m]')
+ax.set_xlabel('Distance [m]')
+ax.set_ylabel('Height [m]')
 
 
 
@@ -65,14 +62,32 @@ def init():
     return line,
 
 def update(frame):
+    Xlist = [pos[0] for pos in p1.position]
+    Ylist = [pos[1] for pos in p1.position]
+    line.set_data(Xlist, Ylist)
     p1.move()
     p1.apply_gravity()
 
-    Xlist = [pos[0] for pos in p1.position]
-    Ylist = [pos[1] for pos in p1.position]
 
-    line.set_data(Xlist, Ylist)
     return line,
+#text
+props = dict(boxstyle='round', facecolor='wheat', alpha =0.5)
+textstr = (f"t_flight = {p1.timetaken:.2f}"
+           '\n'
+           f"t_peak = {p1.t_peak:.2f}")
+
+ax.text(0.05,0.95, textstr, transform=ax.transAxes, fontsize=14,
+        verticalalignment='top', bbox=props)
+
+
+#button
+
+#slider section
+ax_velocity = plt.axes([0.15,0.1,0.65,0.03])
+ax_angle = plt.axes([0.15,0.05,0.65,0.03])
+
+s_velocity = Slider(ax_velocity, "Velocity", 0, 50, valinit=25)
+s_angle = Slider(ax_angle, "Angle", 0, 90, valinit=45)
 
 
 ani = FuncAnimation(fig, update, init_func=init,blit=True, interval=5, repeat=True, frames=1)
