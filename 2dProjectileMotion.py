@@ -32,7 +32,7 @@ class Projectile:
             self.yv += self.gravity * timestep
 
     def discover(self):
-        maxY = (self.yv * self.t_peak + 1 / 2 * gravity * (self.t_peak ** 2))
+        maxY = (self.yv * self.t_peak + 0.5 * gravity * (self.t_peak ** 2))
         maxX = (self.xv * self.timetaken)
         return maxX * 1.1 , maxY * 1.1       # I multiply each value to give a buffer so it doesnt go off screen
 
