@@ -81,10 +81,9 @@ class Projectile:
 
             if y > self.MaxHeight:
                 self.MaxHeight = y
+                
             if y <= 0:
                 self.MaxDistance = x
-
-            if y < 0:
                 self.is_airborne = False
 
             self.position.append([x, y])
