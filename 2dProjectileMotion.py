@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import math
-import tkinter as tk
 from tkinter import messagebox
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Slider, Button
@@ -12,7 +11,6 @@ Cd = 0.47          #drag coefficient (sphere)
 rho = 1.225        #air density
 A = 0.01           #cross sectional area
 mass = 1.0         #mass
-
 
 def showInfo(event):
     info = (
@@ -31,7 +29,6 @@ def changestr():
         bairRes.label.set_text(f'Air Resistance \nON')
     else:
         bairRes.label.set_text('Air Resistance \nOFF')
-
     fig.canvas.draw_idle()
 
 def reset(val):
@@ -47,8 +44,6 @@ def reset(val):
     maxX,maxY = p1.discover()
     ax.set_xlim(0,maxX)
     ax.set_ylim(0,maxY)
-
-
 
 class Projectile:
     def __init__(self, velocity, angle, gravity):
@@ -81,7 +76,7 @@ class Projectile:
 
             if y > self.MaxHeight:
                 self.MaxHeight = y
-                
+
             if y <= 0:
                 self.MaxDistance = x
                 self.is_airborne = False
@@ -89,12 +84,13 @@ class Projectile:
             self.position.append([x, y])
 
     def apply_forces(self):
+        if self.angle == 90:
+            self.xv = 0
+
         if self.is_airborne:
+            v = math.sqrt(self.xv**2 + self.yv**2)
             if air_resistance:
-
-
-                #Drag force magnitude
-                drag = (0.5 * Cd * rho * A * self.velocity ** 2) / mass
+                drag = (0.5 * Cd * rho * A * v ** 2) / mass #Drag force magnitude
 
                 #Direction opposite velocity
                 ax_drag = -drag * (self.xv / self.velocity)
@@ -149,16 +145,12 @@ def update(frame):
     p1.apply_forces()
     p1.move()
 
-
-
-
     Xlist = [pos[0] for pos in p1.position]
     Ylist = [pos[1] for pos in p1.position]
     line.set_data(Xlist, Ylist)
 
     #fetches particles current pos
     current_x, current_y = p1.position[-1]
-    global current_v
     current_v = math.sqrt(p1.xv **2 + p1.yv **2)
 
     position_text.set_text(
@@ -173,10 +165,6 @@ def update(frame):
 #text
 props = dict(boxstyle='round', facecolor='wheat', alpha =0.5)
 
-
-
-
-
 position_text = ax.text(
     0.05, 0.95, "",
     transform=ax.transAxes,
@@ -187,7 +175,7 @@ position_text = ax.text(
 
 #buttons
 ax_stat = plt.axes([0.85, 0.9, 0.1, 0.05])
-bstat = Button(ax_stat, 'stats')
+bstat = Button(ax_stat, 'Stats')
 bstat.on_clicked(showInfo)
 
 ax_airRes = plt.axes([0.85, 0.05, 0.1, 0.075])
@@ -202,13 +190,10 @@ s_velocity = Slider(ax_velocity, "Velocity", 5, 50, valinit=25)
 s_angle = Slider(ax_angle, "Angle", 1, 90, valinit=45)
 s_gravity = Slider(ax_gravity, "Gravity", 1, 100, valinit= 9.81)
 
-
-
 s_velocity.on_changed(reset)
 s_angle.on_changed(reset)
 s_gravity.on_changed(reset)
 
 ani = FuncAnimation(fig, update, init_func=init, blit=False, interval=20)
-
 
 plt.show()
