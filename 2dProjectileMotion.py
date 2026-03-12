@@ -93,8 +93,8 @@ class Projectile:
                 drag = (0.5 * Cd * rho * A * current_v ** 2) / mass #Drag force magnitude
 
                 #Direction opposite velocity
-                ax_drag = -drag * (self.xv / self.velocity)
-                ay_drag = -drag * (self.yv / self.velocity)
+                ax_drag = -drag * (self.xv / current_v)
+                ay_drag = -drag * (self.yv / current_v)
 
                 #Total acceleration
                 ax = ax_drag
