@@ -88,9 +88,9 @@ class Projectile:
             self.xv = 0
 
         if self.is_airborne:
-            v = math.sqrt(self.xv**2 + self.yv**2)
+
             if air_resistance:
-                drag = (0.5 * Cd * rho * A * v ** 2) / mass #Drag force magnitude
+                drag = (0.5 * Cd * rho * A * current_v ** 2) / mass #Drag force magnitude
 
                 #Direction opposite velocity
                 ax_drag = -drag * (self.xv / self.velocity)
@@ -142,6 +142,8 @@ def init():
     return line,
 
 def update(frame):
+    global current_v
+
     p1.apply_forces()
     p1.move()
 
@@ -194,6 +196,6 @@ s_velocity.on_changed(reset)
 s_angle.on_changed(reset)
 s_gravity.on_changed(reset)
 
-ani = FuncAnimation(fig, update, init_func=init, blit=False, interval=20)
+ani = FuncAnimation(fig, update, init_func=init, blit=False, interval=0)
 
 plt.show()
