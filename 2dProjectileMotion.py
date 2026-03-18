@@ -25,10 +25,8 @@ def showInfo(event):
     messagebox.showinfo("Projectile Data", info)
 
 def changestr():
-    if air_resistance:
-        bairRes.label.set_text(f'Air Resistance \nON')
-    else:
-        bairRes.label.set_text('Air Resistance \nOFF')
+        bairRes.label.set_text(f'Air Resistance \nON' if air_resistance 
+                               else 'Air Resistance\nOFF')
     fig.canvas.draw_idle()
 
 def reset(val):
