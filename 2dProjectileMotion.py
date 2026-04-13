@@ -4,7 +4,6 @@ from tkinter import messagebox
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Slider, Button
 
-
 timestep = 0.01
 air_resistance = False
 Cd = 0.47          #drag coefficient (sphere)
@@ -12,7 +11,7 @@ rho = 1.225        #air density
 A = 0.01           #cross sectional area
 mass = 1.0         #mass
 
-def showInfo(event):
+def showInfo(event):         #This function is responsible for updating the info variable with new updated data and then displaying it
     info = (
         f"Time of flight: {p1.timeElapsed:.2f} s\n"
         f"Range: {p1.position[-1][0]:.2f} m\n"
@@ -24,16 +23,18 @@ def showInfo(event):
 
     messagebox.showinfo("Projectile Data", info)
 
-def changestr():
-        bairRes.label.set_text(f'Air Resistance \nON' if air_resistance 
-                               else 'Air Resistance\nOFF')
+def changestr():  #This function is responsible for updating the label of the air resistance button
+    if air_resistance:
+        bairRes.label.set_text(f'Air Resistance \nON')
+    else:
+        bairRes.label.set_text('Air Resistance \nOFF')
     fig.canvas.draw_idle()
 
-def reset(val):
-    global p1
+def reset(val):  # this function is responsible for reseting the graph with the updated launch variables, and new conditions such as air,-
+    global p1    #  -resistance
 
     velocity = s_velocity.val
-    angle = s_angle.val
+    angle = s_angle.val              #asigns the launch variables the slider values
     gravity = -s_gravity.val
 
     p1 = Projectile(velocity,angle,gravity)
@@ -163,8 +164,6 @@ def update(frame):
     return line, position_text
 
 #text
-props = dict(boxstyle='round', facecolor='wheat', alpha =0.5)
-
 position_text = ax.text(
     0.05, 0.95, "",
     transform=ax.transAxes,
